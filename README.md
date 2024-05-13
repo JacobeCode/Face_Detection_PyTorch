@@ -23,8 +23,12 @@ In this repository you can find files:
 
 ### Additional Content
 
+Database:
 > choi2020starganv2,
 > title={StarGAN v2: Diverse Image Synthesis for Multiple Domains},
 > author={Yunjey Choi and Youngjung Uh and Jaejun Yoo and Jung-Woo Ha},
 > booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
 > year={2020}
+
+YOLO:
+> Jocher, G., Chaurasia, A., & Qiu, J. (2023). Ultralytics YOLO (Version 8.0.0) [Computer software]. https://github.com/ultralytics/ultralytics
