@@ -38,8 +38,8 @@ class EmotionsDataset(Dataset):
         box = (int(self.db['box_left'][index]), int(self.db['box_top'][index]), int(self.db['box_right'][index]), int(self.db['box_bottom'][index]))
         
         # Preparing "only face" image by cropping and getting labels
-        crop_pict = pict.crop(box)
-        label = self.db['label'][index]
+        crop_pict = np.float32(pict.crop(box))
+        label = np.int64(self.db['label'][index])
 
         # Redesigning order of dimension for training
         crop_pict = np.moveaxis(np.array(crop_pict), 2, 0)
@@ -65,7 +65,8 @@ class EmotionsDataset(Dataset):
             
         pads = ((pad_left, pad_right), (pad_top, pad_bottom))
 
-        img_processed = np.ndarray((3,max,min),int)
+        # Preferable for torch - np.float32
+        img_processed = np.ndarray((3, self.horz_max, self.vert_max), np.float32)
 
         # Padding image with constant median value
         for i, x in enumerate(crop_pict):
