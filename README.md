@@ -21,6 +21,10 @@ In this repository you can find files:
 - detect_analysis.ipynb - Jupyter Notebook used for data analysis and manipulation
 - real_time.py - a simple implementation of live object detection with use of camera (currently with use of YOLO)
 
+### Approach Description
+
+#1 Classic architecture with database padding to same maximal size
+
 ### Additional Content
 
 Database:
