@@ -6,12 +6,12 @@ class ERNN(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=1, kernel_size=(197, 197), stride=120)
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=1, kernel_size=(20, 20), stride=10)
         self.relu1 = nn.ReLU()
 
         self.flatten = nn.Flatten()
 
-        self.lin1 = nn.Linear(289, 7)
+        self.lin1 = nn.Linear(576, 7)
         self.soft = nn.Softmax()
 
     def forward(self, x):
