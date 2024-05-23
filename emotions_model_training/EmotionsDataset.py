@@ -8,6 +8,7 @@ from torch.utils.data import Dataset
 from matplotlib import image as img
 from torchvision.transforms import v2
 from torchvision.transforms.functional import resize
+from add_files.torch_transforms import torch_transforms
 
 import numpy as np
 import torchvision.transforms as ttinter
@@ -49,50 +50,53 @@ class EmotionsDataset(Dataset):
         crop_pict = np.float32(pict.crop(box))
         label = np.int64(self.db['label'][index])
 
+        # Redesigning order of dimension for training
         crop_pict = np.moveaxis(crop_pict, 2, 0)
 
-        # Redesigning order of dimension for training
-        pre_pict = torch.tensor(crop_pict)
-
         if self.padding is True:
-            # Chaning dimension for training in np.float32
-            crop_pict = np.float32(crop_pict)
-
-            # Manual padding to proper maximal value
-            # Getting proper values for padding
-            pad_vert = (self.vert_max - crop_pict.shape[1]) / 2
-            pad_horz = (self.horz_max - crop_pict.shape[2]) / 2
-
-            # Padding sides (with covering half values - more in: detect_analysis.py)
-            if pad_horz % 2 == 0 or pad_horz % 2 == 1:
-                pad_right = int(pad_horz)
-                pad_left = int(pad_horz)
-            else:
-                pad_right = int(pad_horz) + 1
-                pad_left = int(pad_horz)
-
-            if pad_vert % 2 == 0 or pad_horz % 2 == 1:
-                pad_bottom = int(pad_vert)
-                pad_top = int(pad_vert)
-            else:
-                pad_bottom = int(pad_vert) + 1
-                pad_top = int(pad_vert)
-                
-            pads = ((pad_left, pad_right), (pad_top, pad_bottom))
-
-            # Preferable for torch - np.float32
-            img_processed = np.ndarray((3, self.horz_max, self.vert_max), np.float32)
-
-            # Padding image with constant median value
-            for i, x in enumerate(crop_pict):
-                cons = int(np.median(x))
-                x_p = np.pad(x, pads, 'constant', constant_values=cons)
-                img_processed[i,:,:] = x_p
-        
+            img_processed = self.padding(crop_pict)        
         else:
-            # Other transforms resize
-            img_processed = resize(pre_pict, [256, 256], ttinter.InterpolationMode.BICUBIC, antialias=True)
-            print(img_processed.size)
+            # Other transforms - resize
+            img_processed = resize(torch.tensor(crop_pict), [256, 256], ttinter.InterpolationMode.BICUBIC, antialias=True)
 
         return {'image': img_processed, 'label': label}
+    
+
+    # Function for padding the image (manual)
+    def padding(self, pict):
+        # Chaning dimension for training in np.float32
+        crop_pict = np.float32(pict)
+
+        # Manual padding to proper maximal value
+        # Getting proper values for padding
+        pad_vert = (self.vert_max - crop_pict.shape[1]) / 2
+        pad_horz = (self.horz_max - crop_pict.shape[2]) / 2
+
+        # Padding sides (with covering half values - more in: detect_analysis.py)
+        if pad_horz % 2 == 0 or pad_horz % 2 == 1:
+            pad_right = int(pad_horz)
+            pad_left = int(pad_horz)
+        else:
+            pad_right = int(pad_horz) + 1
+            pad_left = int(pad_horz)
+
+        if pad_vert % 2 == 0 or pad_horz % 2 == 1:
+            pad_bottom = int(pad_vert)
+            pad_top = int(pad_vert)
+        else:
+            pad_bottom = int(pad_vert) + 1
+            pad_top = int(pad_vert)
+            
+        pads = ((pad_left, pad_right), (pad_top, pad_bottom))
+
+        # Preferable for torch - np.float32
+        img_processed = np.ndarray((3, self.horz_max, self.vert_max), np.float32)
+
+        # Padding image with constant median value
+        for i, x in enumerate(crop_pict):
+            cons = int(np.median(x))
+            x_p = np.pad(x, pads, 'constant', constant_values=cons)
+            img_processed[i,:,:] = x_p
+
+        return img_processed
     
