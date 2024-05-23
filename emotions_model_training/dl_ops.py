@@ -3,7 +3,7 @@ class dl_ops():
         self.model = model
         self.loss_fn = loss_fn
         self.optimizer = optimizer
-    def train(self, dataloader, epoch, device):
+    def train(self, dataloader, device):
         # Setting proper mode
         self.model.train()
 
@@ -18,11 +18,18 @@ class dl_ops():
             self.optimizer.step()
             self.optimizer.zero_grad()
         
-        if iteration % 50 == 0:
             loss_item, current = loss.item(), (iteration + 1) * len(sample)
             print(f"Batch: {iteration + 1} ({current / len(dataloader.dataset)}) \n Loss: {loss_item:>3f}")
 
-    def valid():
-        pass
-    def test():
-        pass
+    def valid(self, dataloader, device):
+        self.model.eval()
+
+        for iteration, batch in enumerate(dataloader):
+            sample = batch['image'].to(device)
+            label = batch['label'].to(device)
+
+            pred = self.model(sample)
+            loss = self.loss_fn(pred, label)
+
+    def test(self):
+        self.model.test()
