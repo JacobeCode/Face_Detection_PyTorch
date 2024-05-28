@@ -2,22 +2,29 @@
 
 import cv2
 import torch
+import os
 
 from PIL import Image
 from torch.utils.data import Dataset
 from matplotlib import image as img
 from torchvision.transforms import v2
 from torchvision.transforms.functional import resize
-from add_files.torch_transforms import torch_transforms
+from pathlib import Path
 
 import numpy as np
 import torchvision.transforms as ttinter
+
+try:
+    from emotions_model_training.add_files.torch_transforms import torch_transforms
+except ModuleNotFoundError:
+    os.chdir('..')
+    from emotions_model_training.add_files.torch_transforms import torch_transforms
 
 # Opt_dir is responsible for correct loading images
 # Set this for your database location
 
 class EmotionsDataset(Dataset):
-    def __init__(self, db, opt_dir, horz_max=0, vert_max=0, padding=False):
+    def __init__(self, db, opt_dir, mean, std, horz_max=0, vert_max=0, padding=False):
         super().__init__()
         self.db = db
         self.opt_dir = opt_dir
@@ -25,7 +32,8 @@ class EmotionsDataset(Dataset):
         self.vert_max = vert_max
         self.padding = padding
         self.transforms = v2.Compose([
-            v2.Resize([256, 256], ttinter.InterpolationMode.BICUBIC, max_size=256, antialias=True)
+            v2.ToTensor(),
+            v2.Normalize(mean=mean, std=std)
         ])
 
         # Searching for largest image (if to pass this step if size provided)
@@ -57,7 +65,7 @@ class EmotionsDataset(Dataset):
             img_processed = self.padding(crop_pict)        
         else:
             # Other transforms - resize
-            img_processed = resize(torch.tensor(crop_pict), [256, 256], ttinter.InterpolationMode.BICUBIC, antialias=True)
+            img_processed = self.transforms(resize(torch.tensor(crop_pict), [256, 256], ttinter.InterpolationMode.BICUBIC, antialias=True))
 
         return {'image': img_processed, 'label': label}
     
