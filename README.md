@@ -1,5 +1,9 @@
 # Face_Detection_PyTorch
 
+## Current state
+
+Main frame and model prepared - currently training (2 full runs on basic params).
+
 ## Target of repository
 
 Currently this repository will be used for creating live object identification. It will be done on animal-like database or face emotions dataset.
