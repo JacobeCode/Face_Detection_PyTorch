@@ -167,3 +167,7 @@ face_venv/
 
 # YOLO
 yolo-Weights/
+
+# MFlow meta
+mlarfifacts/
+mlruns/
