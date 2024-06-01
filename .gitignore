@@ -171,3 +171,6 @@ yolo-Weights/
 # MFlow meta
 /mlruns
 /mlartifacts
+
+# Keys
+data_processing/KEYS
