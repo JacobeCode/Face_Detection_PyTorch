@@ -9,6 +9,7 @@ class dl_ops():
         self.model = model
         self.loss_fn = loss_fn
         self.optimizer = optimizer
+        self.run_iter = 0
 
     def train(self, dataloader, device):
         # Setting proper mode
@@ -31,7 +32,8 @@ class dl_ops():
             loss_item, current = loss.item(), (iteration + 1) * len(sample)
             print(f"Batch: {iteration + 1} ({current / len(dataloader.dataset)}) \n Loss: {loss_item:>3f}")
 
-            mlflow.log_metric("train_loss", loss_item, iteration)
+            self.run_iter += 1
+            mlflow.log_metric("train_loss", loss_item, self.run_iter)
 
     def valid(self, dataloader, device, epoch):
         self.model.eval()
@@ -48,6 +50,9 @@ class dl_ops():
             valid_loss = self.loss_fn(pred, label)
             
             correct_pred += (pred.argmax(1) == label).type(torch.float).sum().item()
+            
+            current = (iteration + 1) * len(sample)
+            print(f"Batch: {iteration + 1} ({current / len(dataloader.dataset)})")
 
         valid_loss /= len(dataloader)
         accuracy = correct_pred / len(dataloader.dataset)
